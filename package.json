@@ -10,6 +10,7 @@
     "prodauth": "NODE_ENV=PRODUCTION authentication=true nodemon server",
     "build": "node scripts/build.js",
     "dev": "PORT=3001 node scripts/start.js",
+    "devboth": "npm run dev & npm run dev-server",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "dev-all": "run-p dev dev-server",
     "dev-server": "supervisor --inspect -w db.js,server.js -- server.js",

@@ -136,10 +136,11 @@ exports.checkMaxAndEmail = async (rep, spendingByDoctor, newVisit) => {
     ? await sendEmail(overLimit, rep, newVisit)
     : 'no email sent';
 };
+
 const emailByRep = {
-  Sarah: 'sizdepski@physiciansgrouplaboratories.com',
-  Jessie: 'jbarre@physiciansgrouplaboratories.com',
-  Holly: 'hbroussard@getpgl.com',
+  mss: 'sizdepski@physiciansgrouplaboratories.com',
+  msn: 'jbarre@physiciansgrouplaboratories.com',
+  lan: 'hbroussard@getpgl.com',
   las: 'bbauder@physiciansgrouplaboratories.com',
   andrewtest: 'ayeates@physiciansgrouplaboratories.com',
 };

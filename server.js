@@ -143,7 +143,7 @@ if (development) {
   reload(app)
     .then(() => {
       server.listen(app.get('port'), () => {
-        console.log(`Web server listening on port ${app.get('port')}`);
+        // console.log(`Web server listening on port ${app.get('port')}`);
       });
     })
     .catch(err => {
