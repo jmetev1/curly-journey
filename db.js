@@ -107,7 +107,7 @@ exports.spendingByDoctor = async (rep, clinic) => {
   const myProviders = await ProviderModel.find(query);
   myProviders.forEach(({ name, _id }) => {
     const amount = spendingByDoctor[_id];
-    if (amount)
+    if (amount !== undefined)
       spendingByDoctor[_id] = {
         amount,
         name,

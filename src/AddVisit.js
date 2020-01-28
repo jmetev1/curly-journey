@@ -120,7 +120,6 @@ export default class AddVisit extends React.Component {
                 <MyTextInputField
                   label="Add Receipt"
                   type="file"
-                  capture={true}
                   width={250}
                   marginBottom={32}
                   onChange={e => compress(e, this.uploadReceipt)}
@@ -151,7 +150,7 @@ export default class AddVisit extends React.Component {
                 <SelectMaterials />
                 <ErrorMessage component={Err} name={'amountSpent'} />
                 <Field
-                  inputMode="numeric"
+                  inputMode="decimal"
                   name="amountSpent"
                   as={MyTextInputField}
                   label="Enter Amount Spent"

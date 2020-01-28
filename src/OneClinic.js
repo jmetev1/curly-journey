@@ -21,7 +21,7 @@ export const OneClinic = ({ clinicID, visits = [], clinicName }) => {
     ({ amount }, b) => b.amount - amount
   );
 
-  if (nameAmountPairs.length)
+  if (nameAmountPairs.length) {
     return (
       <>
         In the last year at {clinicName} you have spent these amounts. (Highest
@@ -29,7 +29,7 @@ export const OneClinic = ({ clinicID, visits = [], clinicName }) => {
         <ol>
           {nameAmountPairs.map(({ amount, name: drName }) => (
             <li key={drName}>
-              {drName}: ${amount.toFixed(2)}
+              {drName}: ${amount?.toFixed(2)}
             </li>
           ))}
         </ol>
@@ -48,6 +48,7 @@ export const OneClinic = ({ clinicID, visits = [], clinicName }) => {
         <OneVisit visit={visit} spending={spending} />
       </>
     );
+  }
   if (!clinicID) return 'Choose a clinic';
   return 'No spending found for this clinic this year';
 };
