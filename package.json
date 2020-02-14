@@ -45,7 +45,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "evergreen-ui": "^4.19.3",
+    "evergreen-ui": "^4.23.0",
     "express": "4.16.2",
     "express-fileupload": "^1.1.6",
     "express-session": "^1.17.0",

@@ -9,8 +9,9 @@ import {
 import { routeNames, Loading, Pretty } from './Fields';
 
 const App = ({ userPromise }) => {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const { dev } = window.pglOptions;
+  const [loading, setLoading] = useState(!dev);
+  const [user, setUser] = useState(dev ? 'test' : null);
   useEffect(() => {
     userPromise
       .then(res => res.json())

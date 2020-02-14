@@ -1,2 +1,0 @@
-(this["webpackJsonpexpress-HelloWorld"]=this["webpackJsonpexpress-HelloWorld"]||[]).push([[9],{75:function(e,n,t){"use strict";t.r(n);var r=t(0),o=t.n(r),s=t(51),a=t.n(s),l=t(37);it("renders without crashing",(function(){var e=document.createElement("div");a.a.render(o.a.createElement(l.default,null),e),a.a.unmountComponentAtNode(e)}))}}]);
-//# sourceMappingURL=9.100f2681.chunk.js.map

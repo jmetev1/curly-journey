@@ -1,2 +1,0 @@
-(this["webpackJsonpexpress-HelloWorld"]=this["webpackJsonpexpress-HelloWorld"]||[]).push([[23],{171:function(s,e,o){s.exports=o.p+"static/media/la_south.b57e2716.gif"}}]);
-//# sourceMappingURL=23.bdd0aa9d.chunk.js.map

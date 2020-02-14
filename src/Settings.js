@@ -22,6 +22,7 @@ export default class Settings extends React.Component {
     return (
       <Pane>
         <div>Current User is {user}</div>
+        Setting dev to true will set user to test, maybe
         {Object.entries(rest).map(([key, value]) => (
           <Label key={key} height={height}>
             {key}
