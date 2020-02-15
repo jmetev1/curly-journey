@@ -1,2 +1,0 @@
-(this["webpackJsonpexpress-HelloWorld"]=this["webpackJsonpexpress-HelloWorld"]||[]).push([[16],{68:function(e){e.exports=JSON.parse('["Aaberg","Bob","Randall","Farina","Donald"]')}}]);
-//# sourceMappingURL=16.2434f296.chunk.js.map
