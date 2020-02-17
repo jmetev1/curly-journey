@@ -18,7 +18,7 @@ phases:
       # Remove existing node_modules to clear dev dependencies
       # Install runtime dependencies
       - npm install
-      - npm build
+      - npm run build
   post_build:
     commands:
       - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template-file template-export.yml
