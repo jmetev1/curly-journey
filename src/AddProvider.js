@@ -1,6 +1,6 @@
 import React from 'react';
 import { url, getMyClinics, automatic } from './url';
-import random from './random-name';
+import random from './pkgs/random-name';
 import {
   SelectClinic,
   DevInfo,

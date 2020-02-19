@@ -9,18 +9,18 @@ import {
 import { routeNames, Loading, Pretty } from './Fields';
 
 const App = ({ userPromise }) => {
-  const { dev } = window.pglOptions;
-  const [loading, setLoading] = useState(!dev);
-  const [user, setUser] = useState(dev ? 'test' : null);
+  const { stayLoggedIn } = window.pglOptions;
+  const [loading, setLoading] = useState(!stayLoggedIn);
+  const [user, setUser] = useState(stayLoggedIn ? 'test' : null);
   useEffect(() => {
     userPromise
       .then(res => res.json())
-      .then(user => {
-        setUser(user);
+      .then(userFromServer => {
+        if (!user) setUser(userFromServer);
         setLoading(false);
       })
       .catch(e => {
-        throw new Error('app js setState on comp did mount');
+        throw new Error('app js setState on comp did mount', e);
       });
   }, [userPromise]);
   return loading ? (

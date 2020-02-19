@@ -57,8 +57,8 @@ const Login = ({ setUser, user }) => {
               <Button type="submit" disabled={isSubmitting} children="Submit" />
               {failed && (
                 <Pane width="90vw" border="default">
-                  'Password or username is incorrect, please try again or
-                  contact tech support at 985-966-5497'
+                  Password or username is incorrect, please try again or contact
+                  tech support at 985-966-5497
                 </Pane>
               )}
             </Form>

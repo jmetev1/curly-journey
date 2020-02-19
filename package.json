@@ -11,9 +11,10 @@
     "build": "node scripts/build.js",
     "dev": "PORT=3001 node scripts/start.js",
     "devboth": "npm run dev & npm run dev-server",
+    "fresh": "rm -rf node_modules && npm i",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "dev-all": "run-p dev dev-server",
-    "dev-server": "supervisor --inspect -w db.js,server.js -- server.js",
+    "dev-server": "supervisor --inspect -w server/db.js,server/server.js -- server/server.js",
     "test": "mocha --recursive tests --exit",
     "precommit": "npm run build && npm run prodauth",
     "next": "npm run build && rm -rf node_modules && npm i --production"
@@ -43,6 +44,7 @@
     "eslint-plugin-flowtype": "3.13.0",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-react-hooks": "^1.7.0",
     "evergreen-ui": "^4.23.0",
@@ -162,5 +164,8 @@
   "prettier": {
     "singleQuote": true,
     "trailingComma": true
+  },
+  "engines": {
+    "node": ">=10.0"
   }
 }

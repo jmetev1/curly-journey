@@ -1,9 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { url } from './url';
-import { Wrapper, SelectClinic, Receipt } from './Fields';
+import { Wrapper, SelectClinic, OneVisit } from './Fields';
 import { OneClinic } from './OneClinic';
+import { TabNavigation, Tab } from 'evergreen-ui';
 
-export default class PastVisits extends React.Component {
+const PastVisits = () => {
+  const [showByClinic, setShowByClinic] = useState(false);
+  const toggleShowByClinic = setShowByClinic.bind(null, !showByClinic);
+
+  return (
+    <>
+      <TabNavigation>
+        <Tab
+          key="one"
+          id="one"
+          isSelected={showByClinic}
+          onSelect={toggleShowByClinic}
+        >
+          Show Visits By Clinic
+        </Tab>
+        <Tab
+          key="two"
+          id="two"
+          isSelected={!showByClinic}
+          onSelect={toggleShowByClinic}
+        >
+          Show Visits By Spending
+        </Tab>
+      </TabNavigation>
+
+      {showByClinic ? <PastVisitsByClinic /> : <PastVisitsBySpending />}
+    </>
+  );
+};
+
+const PastVisitsBySpending = () => {
+  const [providers, setProviders] = useState([]);
+  useEffect(() => {
+    fetch(url + 'totalsForProviders')
+      .then(res => res.json())
+      .then(setProviders);
+  }, []);
+  return (
+    <>
+      by spending
+      {providers.map(({ amount, name, rep, _id }) => {
+        return (
+          <div key={_id}>
+            rep {rep} has spent {amount} at {name}...
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+class PastVisitsByClinic extends React.Component {
   state = {};
   componentDidMount() {
     Promise.all(['visits', 'clinic'].map(type => fetch(url + type)))
@@ -44,7 +96,6 @@ export default class PastVisits extends React.Component {
 
 const SelectClinicModule = ({ clinics, byClinic }) => {
   const [clinic, setClinic] = useState({});
-
   const setClinicByID = ({ target: { value } }) => {
     const chosen = clinics.find(c => value === c._id) || {};
     setClinic(chosen);
@@ -63,3 +114,4 @@ const SelectClinicModule = ({ clinics, byClinic }) => {
 /*
 get spending by docotr seems to fail with admin
 */
+export default PastVisits;

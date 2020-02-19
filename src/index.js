@@ -7,6 +7,12 @@ import { ErrorBoundary } from './ErrorBoundary';
 
 const dev = process.env.NODE_ENV === 'development';
 
+// const id = setInterval(() => {
+//   fetch(url + 'totalsForProviders').then(things => {
+//     if (things.status === 200) clearInterval(id);
+//   });
+// }, 200);
+
 if (!window.pglOptions) window.pglOptions = {};
 const userPromise = fetch(url + 'login', { credentials: 'include' });
 
@@ -16,6 +22,7 @@ for (let [key, value] of Object.entries({
   prefill: dev,
   showState: dev,
   settings: dev,
+  stayLoggedIn: false,
 })) {
   const ls = localStorage[key]; //it's a string!!!!!
   if (ls) {

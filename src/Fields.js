@@ -27,13 +27,14 @@ export const MyTextInputField = props => (
 export const SelectClinic = ({ clinics = [], setClinic }) => {
   return (
     <MySelectField label="Choose a clinic" onChange={setClinic}>
-      {[{ _id: 0, name: 'Choose a clinic' }, ...clinics].map(
-        ({ _id, name }) => (
-          <option key={_id} value={_id}>
-            {name}
-          </option>
-        )
-      )}
+      {[
+        { _id: 0, name: 'Choose a clinic' },
+        ...clinics.sort((a, b) => (a.name > b.name ? 1 : -1)),
+      ].map(({ _id, name }) => (
+        <option key={_id} value={_id}>
+          {name}
+        </option>
+      ))}
     </MySelectField>
   );
 };
@@ -62,7 +63,9 @@ export const SubmitButton = function({ link = '' }) {
       <div>{link || <button onClick={reload}>Add Another</button>}</div>
     </div>
   ) : (
-    <Button onClick={doIt} appearance="primary" children="Submit" />
+    <Button onClick={doIt} appearance="primary">
+      Submit
+    </Button>
   );
 };
 
@@ -193,16 +196,13 @@ export const Header = ({ user }) => {
   return (
     <nav style={{ display: 'flex', flexWrap: 'wrap' }}>
       {window.pglOptions.dev && (
-        <MyButton
-          key="user"
-          children={<span style={style}>user is {user}</span>}
-        />
+        <MyButton key="user">
+          <span style={style}>user is {user}</span>
+        </MyButton>
       )}
-      <MyButton
-        key="logout"
-        onClick={logout}
-        children={<span style={style}>Logout</span>}
-      />
+      <MyButton key="logout" onClick={logout}>
+        <span style={style}>Logout</span>
+      </MyButton>
       {Object.entries(routeNames)
         .filter(([label]) => {
           if (user === 'admin') return label === 'Past Visits';
