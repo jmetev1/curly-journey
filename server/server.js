@@ -4,7 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-const buildDir = path.join(__dirname, 'build');
+const buildDir = path.join(__dirname, '..', 'build');
 
 dotenv.load();
 const development = process.env.NODE_ENV === 'development';
