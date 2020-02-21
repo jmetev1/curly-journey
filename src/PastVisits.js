@@ -5,8 +5,7 @@ import { OneClinic } from './OneClinic';
 import { TabNavigation, Tab } from 'evergreen-ui';
 
 const PastVisits = () => {
-  //change
-  const [showByClinic, setShowByClinic] = useState(false);
+  const [showByClinic, setShowByClinic] = useState(true);
   const toggleShowByClinic = setShowByClinic.bind(null, !showByClinic);
 
   return (
