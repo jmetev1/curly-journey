@@ -4,10 +4,10 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node server",
-    "prod": "NODE_ENV=PRODUCTION nodemon server",
+    "start": "node server/server",
+    "prod": "NODE_ENV=PRODUCTION nodemon server/server",
     "buildrun": "npm run build && npm run prodauth",
-    "prodauth": "NODE_ENV=PRODUCTION authentication=true nodemon server",
+    "prodauth": "NODE_ENV=PRODUCTION authentication=true nodemon server/server",
     "build": "node scripts/build.js",
     "dev": "PORT=3001 node scripts/start.js",
     "devboth": "npm run dev & npm run dev-server",

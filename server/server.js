@@ -153,7 +153,7 @@ if (development) {
     });
 } else {
   app.get('*', (req, res) => {
-    res.sendFile(`${__dirname}/build/index.html`);
+    res.sendFile(path.join(buildDir, 'index.html'));
   });
 
   server.listen(app.get('port'), () => {
