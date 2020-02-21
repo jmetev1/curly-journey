@@ -1,13 +1,19 @@
 module.exports = {
+  parser: 'babel-eslint',
+  extends: 'airbnb',
+  // add your environment below the extends key, like this:
   env: {
-    browser: true,
-    commonjs: true,
+    node: true,
+    es6: true,
   },
-  extends: 'eslint:recommended',
+  plugins: ['import'],
   rules: {
-    indent: ['error', 'tab'],
-    'linebreak-style': ['error', 'unix'],
-    quotes: ['error', 'single'],
-    semi: ['error', 'never'],
+    'no-underscore-dangle': 0,
+    'comma-dangle': 0,
+    'arrow-parens': 0,
+    indent: 0,
+    'implicit-arrow-linebreak': 0,
+    'object-curly-newline': 0,
+    'function-paren-newline': 0,
   },
 };

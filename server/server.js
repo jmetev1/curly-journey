@@ -1,4 +1,5 @@
 const express = require('express');
+
 const app = express();
 const path = require('path');
 const cors = require('cors');
@@ -8,9 +9,9 @@ const buildDir = path.join(__dirname, '..', 'build');
 
 dotenv.load();
 const development = process.env.NODE_ENV === 'development';
-let reload;
-if (development) reload = require('reload');
-else app.use(express.static(buildDir));
+const reload = development ? require('reload') : 'n';
+
+if (!development) app.use(express.static(buildDir));
 const http = require('http');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -23,7 +24,7 @@ const store = new MongoDBStore(
     databaseName: 'poolmap',
     collection: 'mySessions',
   },
-  (error, suc) => {}
+  () => {}
 );
 const db = require('./db');
 
@@ -40,9 +41,14 @@ app.use(
   bodyParser.json()
 );
 
+app.get('/api/totalsForProviders', async (req, res) => {
+  const totals = await db.getTotalsByRep(req.session.rep);
+  res.json(totals.sort(({ amount }, b) => b.amount - amount));
+});
+
 app.options('/api/login', cors());
 app.get('/api/login', cors(), (req, res) => {
-  let { rep } = req && req.session;
+  const { rep } = req && req.session;
   res.json(rep || false);
 });
 
@@ -52,19 +58,16 @@ app.get('/api/logout', cors(), (req, res) => {
 });
 
 app.post('/api/login', cors(), (req, res) => {
-  const { username, password, newUser } = req.body;
+  const { username, password } = req.body;
   if (process.env[username] === password) {
-    const rep = (req.session.rep = username);
+    const rep = username;
+    req.session.rep = username;
     res.json(rep);
   } else {
     res.json(false);
   }
 });
 app.options('/api/visit', cors());
-
-app.post('/api/user', ({ session, body }, res) => {
-  console.log(session, body);
-});
 
 app.get('/api/visits', cors(), async (req, res) => {
   res.json(await db.getVisitsThisYear(req.session.rep));
@@ -81,13 +84,11 @@ app.get('/api/getSpendingByDoctor/:clinicID', cors(), async (req, res) => {
   res.json(await db.spendingByDoctor(req.session.rep, req.params.clinicID));
 });
 
-/* pass array of clinics to get all providers for each. */
-app.post('/api/provider', cors(), async ({ body, session }, res) => {
-  // console.log(98, body, session, res);
+app.post('/api/provider', cors(), async ({ body, ...rest }, res) => {
   res.json(
     await db.addProvider({
       ...body,
-      rep: session.rep,
+      rep: rest.session.rep,
     })
   );
 });
@@ -95,11 +96,10 @@ app.post('/api/provider', cors(), async ({ body, session }, res) => {
 let name = '0.8708915141890314';
 app.post('/api/receipt', async (req, res) => {
   name = Math.random().toString();
-  const path = `./receipts/${name}.png`;
-  console.log(109, path);
-  req.files.myFile.mv(path, async err => {
-    if (err) return res.status(500).send(err);
-    res.json((await db.addPhoto(name))._id);
+  const pathToFile = `./receipts/${name}.png`;
+  req.files.myFile.mv(pathToFile, async err => {
+    if (err) res.status(500).send(err);
+    else res.json((await db.addPhoto(name))._id);
   });
 });
 
@@ -114,7 +114,6 @@ app.get('/api/receipt/:receiptID', async (req, res) => {
 });
 
 app.post('/api/visit', cors(), async (req, res) => {
-  console.log(129, req.session.rep);
   const addVisitResult = await db.addVisit({
     ...req.body,
     rep: req.session.rep,
@@ -154,7 +153,7 @@ if (development) {
     });
 } else {
   app.get('*', (req, res) => {
-    res.sendFile(__dirname + '/build/index.html');
+    res.sendFile(`${__dirname}/build/index.html`);
   });
 
   server.listen(app.get('port'), () => {

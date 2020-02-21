@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { url } from './url';
-import { Wrapper, SelectClinic, OneVisit } from './Fields';
+import { Wrapper, SelectClinic } from './Fields';
 import { OneClinic } from './OneClinic';
 import { TabNavigation, Tab } from 'evergreen-ui';
 
 const PastVisits = () => {
+  //change
   const [showByClinic, setShowByClinic] = useState(false);
   const toggleShowByClinic = setShowByClinic.bind(null, !showByClinic);
 
@@ -43,14 +44,13 @@ const PastVisitsBySpending = () => {
   }, []);
   return (
     <>
-      by spending
-      {providers.map(({ amount, name, rep, _id }) => {
-        return (
-          <div key={_id}>
-            rep {rep} has spent {amount} at {name}...
-          </div>
-        );
-      })}
+      <h3>Spending From Highest to Lowest</h3>
+      {providers.map(({ amount, name, rep, _id, clinicName }) => (
+        <div key={_id}>
+          {rep.toUpperCase()} has spent ${amount.toFixed(2)} on {name} at{' '}
+          {clinicName}
+        </div>
+      ))}
     </>
   );
 };
