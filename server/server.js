@@ -97,7 +97,7 @@ let name = '0.8708915141890314';
 app.post('/api/receipt', async (req, res) => {
   name = Math.random().toString();
   const pathToFile = `./receipts/${name}.png`;
-  req.files.myFile.mv(pathToFile, async err => {
+  req.files.myFile.mv(pathToFile, async (err) => {
     if (err) res.status(500).send(err);
     else res.json((await db.addPhoto(name))._id);
   });
@@ -145,7 +145,7 @@ if (development) {
         console.log(`Web server listening on port ${app.get('port')}`);
       });
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(
         'Reload could not start, could not start server/sample app',
         err
