@@ -265,6 +265,7 @@ export const routeNames = {
   'Add Provider': ['addprovider'],
   'Add Visit': ['addvisit'],
   Settings: ['settings'],
+  Home: ['home'],
 };
 
 export const Pretty = ({ children, user }) => (

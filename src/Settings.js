@@ -16,12 +16,12 @@ export default class Settings extends React.Component {
 
   render() {
     const { updateOptions, ...rest } = this.state;
-    const { user } = this.props;
+    const { region } = this.props.user;
     const height = 28;
 
     return (
       <Pane>
-        <div>Current User is {user}</div>
+        <div>Current User is {region}</div>
         <div>Setting dev to true will set user to test, maybe</div>
         {Object.entries(rest).map(([key, value]) => (
           <Label key={key} height={height}>

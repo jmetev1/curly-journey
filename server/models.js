@@ -2,10 +2,13 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+const AttestSchema = new Schema({ signed: Boolean, date: String });
+
 const UserSchema = new Schema({
-  email: String,
-  password: String,
+  attests: [AttestSchema],
+  region: String,
 });
+
 const VisitSchema = new Schema({
   rep: String,
   date: String,
@@ -25,6 +28,7 @@ const ProviderSchema = new Schema({
   clinic: String,
   rep: String,
 });
+
 const ClinicSchema = new Schema({
   name: String,
   providers: [String],
@@ -42,4 +46,5 @@ module.exports = {
   ReceiptModel: mongoose.model('ReceiptModel', ReceiptSchema),
   VisitModel: mongoose.model('VisitModel', VisitSchema),
   UserModel: mongoose.model('UserModel', UserSchema),
+  AttestModel: mongoose.model('AttestModel', AttestSchema),
 };

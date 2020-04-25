@@ -15,6 +15,7 @@ const App = ({ userPromise }) => {
     userPromise
       .then(res => res.json())
       .then(userFromServer => {
+        console.log('app.js, user from server', userFromServer);
         setUser(userFromServer);
         setLoading(false);
       })
@@ -39,7 +40,7 @@ const App = ({ userPromise }) => {
                   else {
                     const Component = lazy(() => import(`./${componentName}`));
                     return (
-                      <Pretty user={user}>
+                      <Pretty user={user?.region}>
                         <Component {...props} user={user} />
                       </Pretty>
                     );
@@ -56,7 +57,7 @@ const App = ({ userPromise }) => {
             }}
           />
           <Route>
-            <Redirect to={user ? '/addvisit' : '/login'} />
+            <Redirect to={user ? '/home' : '/login'} />
           </Route>
         </Switch>
       </Suspense>

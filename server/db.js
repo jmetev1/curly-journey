@@ -9,23 +9,80 @@ let databaseError;
 
 const Models = require('./models');
 
-const { ReceiptModel, VisitModel, ProviderModel, ClinicModel } = Models;
+const {
+  ReceiptModel,
+  VisitModel,
+  ProviderModel,
+  ClinicModel,
+  UserModel,
+  AttestModel,
+} = Models;
 
 mongoose
   .connect(
     `mongodb://cain:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
-    { connectTimeoutMS: 1000 }
+    { connectTimeoutMS: 1000, useUnifiedTopology: true, useNewUrlParser: true }
   )
   .then(
     () => {},
     (err) => {
       databaseError = err;
+      console.log(err);
     }
   );
 const db = mongoose.connection;
 db.on('error', (e) => {
   databaseError = e;
 });
+/* eslint-disable no-multiple-empty-lines */
+//
+//
+//
+exports.sign = async (region, date, id) => {
+  const user = (await UserModel.find({ region }))[0];
+  const attest = await user.attests.id(id);
+  attest.signed = true;
+  await user.save();
+
+  return user.attests;
+};
+
+exports.getUser = async (region) => {
+  const users = await UserModel.find({ region });
+  if (users.length > 1) throw new Error('repeat users');
+  else {
+    let user;
+    if (users.length === 0) user = await UserModel.create({ region });
+    else [user] = users;
+
+    const visits = await VisitModel.find({ rep: region });
+    const monthsThatHaveVisits = new Set();
+    visits.forEach((v) => {
+      const date = new Date(v.date);
+      const cutoff = new Date('2020-04-30');
+      if (date > cutoff) {
+        monthsThatHaveVisits.add(`${date.getMonth()}/${date.getFullYear()}`);
+      } else {
+        console.log('not added', v.date);
+      }
+    });
+    const copyAttests = [...user.attests];
+    const attests = new Set(copyAttests.map((att) => att.date));
+    const toAdd = [];
+
+    monthsThatHaveVisits.forEach(async (date) => {
+      if (!attests.has(date)) {
+        toAdd.push(AttestModel.create({ signed: false, date }));
+      }
+    });
+
+    const res = await Promise.all(toAdd);
+    user.attests.addToSet(...res);
+    await user.save();
+
+    return user;
+  }
+};
 
 exports.addProvider = async (req) => ProviderModel.create(req);
 
@@ -92,7 +149,7 @@ exports.totalsForProviders = async (providers, clinicIDtoName) => {
         name,
         _id,
         rep,
-        clinicName: clinicIDtoName[clinic],
+        ...(clinicIDtoName && { clinicName: clinicIDtoName[clinic] }),
       };
     }
   });
@@ -141,14 +198,17 @@ exports.spendingByDoctor = async (rep, clinic) => {
   });
   return spendingByDoctor;
 };
+
 exports.addVisit = async (body) => {
   const { _id, providers } = await VisitModel.create(body);
   if (_id) {
-    const emailResult = await exports.checkMaxAndEmail(
-      body.rep,
-      await this.totalsForProviders(providers),
-      body
-    );
+    let emailResult;
+    try {
+      const totals = await this.totalsForProviders(providers);
+      emailResult = await exports.checkMaxAndEmail(body.rep, totals, body);
+    } catch (e) {
+      emailResult = `failed to email with ${JSON.stringify({ providers })}`;
+    }
     return { _id, email: emailResult };
   }
   return 'db create failed';
@@ -169,12 +229,8 @@ const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
   providers.map((ar) => {
     const { amount: totalForYear, name } = Array.isArray(ar) && ar[1];
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    const addresses = [emailByRep[rep]];
-    if (!addresses.length) {
-      if (process.env.NODE_ENV !== 'PRODUCTION') {
-        throw new Error('no email address');
-      }
-    }
+    const addresses = [emailByRep[rep] || 'jmetevier@gmail.com'];
+
     const msg = {
       to: addresses,
       from: 'PGL_Monitoring_app@pgl.com',

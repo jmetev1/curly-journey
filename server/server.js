@@ -47,9 +47,19 @@ app.get('/api/totalsForProviders', async (req, res) => {
 });
 
 app.options('/api/login', cors());
-app.get('/api/login', cors(), (req, res) => {
+app.get('/api/login', cors(), async (req, res) => {
   const { rep } = req && req.session;
-  res.json(rep || false);
+  const details = await db.getUser(rep);
+  if (rep) {
+    res.json(details);
+  } else {
+    res.json(false);
+  }
+});
+
+app.post('/api/sign', async ({ body }, res) => {
+  const { date, id } = body;
+  res.json(await db.sign(session.rep, date, id));
 });
 
 app.get('/api/logout', cors(), (req, res) => {
@@ -57,16 +67,17 @@ app.get('/api/logout', cors(), (req, res) => {
   res.send(JSON.stringify('ok'));
 });
 
-app.post('/api/login', cors(), (req, res) => {
+app.post('/api/login', cors(), async (req, res) => {
   const { username, password } = req.body;
   if (process.env[username] === password) {
     const rep = username;
     req.session.rep = username;
-    res.json(rep);
+    res.json(await db.getUser(rep));
   } else {
     res.json(false);
   }
 });
+
 app.options('/api/visit', cors());
 
 app.get('/api/visits', cors(), async (req, res) => {
@@ -118,7 +129,6 @@ app.post('/api/visit', cors(), async (req, res) => {
     ...req.body,
     rep: req.session.rep,
   });
-  console.log(addVisitResult);
   res.json(addVisitResult);
 });
 

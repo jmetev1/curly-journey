@@ -22,10 +22,10 @@ export default class AddVisit extends React.Component {
   };
 
   componentDidMount() {
-    getMyClinics().then(allMyClinics => this.setState({ allMyClinics }));
+    getMyClinics().then((allMyClinics) => this.setState({ allMyClinics }));
     fetch(url + 'getproviders')
-      .then(r => r.json())
-      .then(providersByClinic => {
+      .then((r) => r.json())
+      .then((providersByClinic) => {
         this.setState({ providersByClinic });
       });
   }
@@ -39,13 +39,13 @@ export default class AddVisit extends React.Component {
         ...values,
         receiptID: this.state.receiptID || '',
         clinicName:
-          this.state.allMyClinics.find(clinic => clinic._id === values.clinic)
+          this.state.allMyClinics.find((clinic) => clinic._id === values.clinic)
             ?.name || 'name not found',
       }),
     })
-      .then(res => res.json())
-      .then(res => {
-        if (window.pglOptions.dev) {
+      .then((res) => res.json())
+      .then((res) => {
+        if (window.pglOptions.dev && Array.isArray(res.email)) {
           res.email.forEach(console.table);
         }
         if (res && res._id) {
@@ -55,21 +55,23 @@ export default class AddVisit extends React.Component {
       });
   };
 
-  uploadReceipt = file => {
+  uploadReceipt = (file) => {
     const data = new FormData();
     data.append('myFile', file);
     fetch(url + 'receipt', {
       method: 'POST',
       body: data,
     })
-      .then(r => {
+      .then((r) => {
         if (r.ok) return r.json();
         this.setState({
           receiptUpload: 'Upload failed, please contact tech support',
         });
         throw new Error('Upload failed, please contact tech support');
       })
-      .then(receiptID => this.setState({ receiptID, receiptSubmitted: true }));
+      .then((receiptID) =>
+        this.setState({ receiptID, receiptSubmitted: true })
+      );
   };
   render() {
     const { providersByClinic, allMyClinics } = this.state;
@@ -122,7 +124,7 @@ export default class AddVisit extends React.Component {
                   type="file"
                   width={250}
                   marginBottom={32}
-                  onChange={e => compress(e, this.uploadReceipt)}
+                  onChange={(e) => compress(e, this.uploadReceipt)}
                 />
                 {this.state.receiptUpload}
                 <ErrorMessage component={Err} name={'date'} />
@@ -141,7 +143,7 @@ export default class AddVisit extends React.Component {
                   <option value="0" key={0}>
                     Choose a Reason
                   </option>
-                  {reasons.map(n => (
+                  {reasons.map((n) => (
                     <option value={n} key={n}>
                       {n}
                     </option>
@@ -205,7 +207,7 @@ const SelectMaterials = () => (
         justifyContent: 'space-around',
       }}
     >
-      {['1', '2', '3', '4', '5'].map(n => (
+      {['1', '2', '3', '4', '5'].map((n) => (
         <Field
           style={{ flex: '1 0 33%' }}
           key={n}
@@ -241,7 +243,7 @@ const SelectProvider = ({ providersByClinic, clinic, ...rest }) => {
   } else {
     return (
       <>
-        This Clinic Has No Providers, Please Add One{' '}
+        This Clinic Has No Providers, Please Add One
         <Link to="/addprovider">Here</Link>
       </>
     );
