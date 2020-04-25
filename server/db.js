@@ -18,18 +18,18 @@ mongoose
   )
   .then(
     () => {},
-    err => {
+    (err) => {
       databaseError = err;
     }
   );
 const db = mongoose.connection;
-db.on('error', e => {
+db.on('error', (e) => {
   databaseError = e;
 });
 
-exports.addProvider = async req => ProviderModel.create(req);
+exports.addProvider = async (req) => ProviderModel.create(req);
 
-exports.providersByRep = async rep => {
+exports.providersByRep = async (rep) => {
   const allProviders = await ProviderModel.find({ rep });
   return allProviders.reduce((acc, c) => {
     const { clinic } = c;
@@ -39,10 +39,10 @@ exports.providersByRep = async rep => {
   }, {});
 };
 
-exports.getClinic = async rep =>
+exports.getClinic = async (rep) =>
   ClinicModel.find(rep === 'admin' ? {} : { rep });
 
-exports.getTotalsByRep = async rep => {
+exports.getTotalsByRep = async (rep) => {
   const query = {};
   if (rep !== 'admin') query.rep = rep;
 
@@ -56,14 +56,14 @@ exports.getTotalsByRep = async rep => {
     return acc;
   }, {});
 
-  const providersIDs = repsProviders.map(p => p._id);
+  const providersIDs = repsProviders.map((p) => p._id);
   const totals = await this.totalsForProviders(providersIDs, clinicIDtoName);
 
   const desiredReps = new Set(
     rep === 'admin' ? ['las', 'lan', 'msn', 'mss'] : [rep]
   );
 
-  return Object.values(totals).filter(total => desiredReps.has(total.rep));
+  return Object.values(totals).filter((total) => desiredReps.has(total.rep));
 };
 
 exports.totalsForProviders = async (providers, clinicIDtoName) => {
@@ -77,7 +77,7 @@ exports.totalsForProviders = async (providers, clinicIDtoName) => {
     },
   });
   const spendingByDoctor = visits.reduce((acc, c) => {
-    c.providers.forEach(p => {
+    c.providers.forEach((p) => {
       acc[p] = (acc[p] || 0) + c.amountSpent / c.providers.length;
     });
     return acc;
@@ -99,7 +99,7 @@ exports.totalsForProviders = async (providers, clinicIDtoName) => {
   return spendingByDoctor;
 };
 
-exports.addPhoto = async name =>
+exports.addPhoto = async (name) =>
   ReceiptModel.create({
     name,
     img: {
@@ -108,9 +108,9 @@ exports.addPhoto = async name =>
     },
   });
 
-exports.receipt = async _id => ReceiptModel.find({ _id });
+exports.receipt = async (_id) => ReceiptModel.find({ _id });
 
-exports.addClinic = async req => ClinicModel.create(req);
+exports.addClinic = async (req) => ClinicModel.create(req);
 
 exports.spendingByDoctor = async (rep, clinic) => {
   const query = rep === 'admin' ? {} : { rep };
@@ -124,7 +124,7 @@ exports.spendingByDoctor = async (rep, clinic) => {
   });
   const spendingByDoctor = myVisitsThisYear.reduce((acc, c) => {
     const { providers, amountSpent } = c;
-    providers.forEach(p => {
+    providers.forEach((p) => {
       acc[p] = (acc[p] || 0) + amountSpent / providers.length;
     });
     return acc;
@@ -141,7 +141,7 @@ exports.spendingByDoctor = async (rep, clinic) => {
   });
   return spendingByDoctor;
 };
-exports.addVisit = async body => {
+exports.addVisit = async (body) => {
   const { _id, providers } = await VisitModel.create(body);
   if (_id) {
     const emailResult = await exports.checkMaxAndEmail(
@@ -166,7 +166,7 @@ emailByRep.test = j;
 emailByRep.jack = j;
 
 const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
-  providers.map(ar => {
+  providers.map((ar) => {
     const { amount: totalForYear, name } = Array.isArray(ar) && ar[1];
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const addresses = [emailByRep[rep]];
@@ -202,12 +202,12 @@ exports.checkMaxAndEmail = async (rep, spendingByDoctor, newVisit) => {
     : 'no email sent';
 };
 
-exports.getVisits = async rep => {
+exports.getVisits = async (rep) => {
   const repToUse = rep === 'admin' ? {} : { rep };
   return VisitModel.find(repToUse);
 };
 
-exports.getVisitsThisYear = async rep => {
+exports.getVisitsThisYear = async (rep) => {
   const year = new Date().getFullYear();
   const query = {
     date: { $gte: `${year}-01-01`, $lte: `${year}-12-31` },
