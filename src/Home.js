@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { url } from './url';
 import { Button, Dialog, TextInputField } from 'evergreen-ui';
-import { MyTextInputField } from './Fields';
 /*eslint-disable quotes*/
 
-const OneAttest = ({ date, signed, id, children, i }) => {
+export const OneAttest = ({ date, signed, children, i }) => {
   const [month, year] = date.split('/');
-  // const [show, setShow] = useState(!i);
   const [show, setShow] = useState(false);
   const toggleShow = () => setShow(!show);
   const [inputName, setInputName] = useState('');
@@ -29,7 +27,7 @@ const OneAttest = ({ date, signed, id, children, i }) => {
                 value={inputName}
                 onChange={({ target }) => setInputName(target.value)}
               />
-              {employees.includes(inputName.toLowerCase())
+              {employees.includes(inputName.trim().toLowerCase())
                 ? children
                 : 'Please fill in your full name to complete'}
             </div>
@@ -69,7 +67,7 @@ const employees = [
   'Beau Bauder',
   'Jessie Barre',
   'Holly Broussard',
-  'Elyse Alford ',
+  'Elyse Alford',
   'Sarah Izdepski',
 ].map((name) => name.toLowerCase());
 
@@ -80,18 +78,19 @@ const Home = ({ user }) => {
     fetch(`${url}sign`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date, id }),
+      body: JSON.stringify({ date, id, status: true }),
     })
       .then((res) => res.json())
       .then(setAttests);
   };
+  const needToSign = attests.filter(({ signed }) => !signed);
 
-  return attests && attests.length ? (
+  return needToSign.length ? (
     <>
-      {attests.map((a, i) => (
+      {needToSign.map((a, i) => (
         <div key={a._id} style={{ border: '1px solid black' }}>
           <OneAttest {...a} key={a._id} i={i}>
-            <div style={{ 'padding-top': '4px' }}>
+            <div style={{ paddingTop: '4px' }}>
               <Button height={32} onClick={sign.bind(null, a._id, a.date)}>
                 Sign
               </Button>
@@ -110,15 +109,15 @@ const text = (
     By digitally signing below you certify that in the past days all money spent
     on food, beverage, and other nominal items (less than $10 value) by you in
     the course of your employment with PGL:
-    <ol>
+    <ol2>
       {[
         `has been reported and entered into this tracking app`,
         `was used in conjunction with educational/workflow-process related visits with providers and;`,
         `complied with all federal and state laws and regulations governing said.`,
       ].map((item) => (
-        <li>{item}</li>
+        <li key={item}>{item}</li>
       ))}
-    </ol>
+    </ol2>
     I also certify that I have complied with all applicable laws including but
     not limited to HIPAA, The Anti-Kickback Statute, The Stark Law, and The
     Eliminating Kickbacks in Recovery Act at all times during my employment with

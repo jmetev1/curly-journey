@@ -47,6 +47,7 @@ app.get('/api/totalsForProviders', async (req, res) => {
 });
 
 app.options('/api/login', cors());
+
 app.get('/api/login', cors(), async (req, res) => {
   const { rep } = req && req.session;
   const details = await db.getUser(rep);
@@ -57,9 +58,9 @@ app.get('/api/login', cors(), async (req, res) => {
   }
 });
 
-app.post('/api/sign', async ({ body }, res) => {
-  const { date, id } = body;
-  res.json(await db.sign(session.rep, date, id));
+app.post('/api/sign', async (req, res) => {
+  const { id, status } = req.body;
+  res.json(await db.sign(req.session.rep, status, id));
 });
 
 app.get('/api/logout', cors(), (req, res) => {
