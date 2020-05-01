@@ -105,26 +105,34 @@ const Home = ({ user }) => {
 };
 
 const text = (
-  <div>
-    By digitally signing below you certify that in the past days all money spent
-    on food, beverage, and other nominal items (less than $10 value) by you in
-    the course of your employment with PGL:
-    <ol2>
+  <div style={{ textAlign: 'justify' }}>
+    <p>
+      By digitally signing below you certify that in the past 30 days all money
+      spent on food, beverage, and other nominal items (less than $10 value) by
+      you in the course of your employment with PGL:
+    </p>
+    <ol>
       {[
-        `has been reported and entered into this tracking app`,
-        `was used in conjunction with educational/workflow-process related visits with providers and;`,
+        `has been reported and entered into this tracking app;`,
+        `was used in conjunction with educational or workflow process related visits with providers; and`,
         `complied with all federal and state laws and regulations governing said.`,
       ].map((item) => (
-        <li key={item}>{item}</li>
+        <li style={{ textAlign: 'initial' }} key={item}>
+          {item}
+        </li>
       ))}
-    </ol2>
-    I also certify that I have complied with all applicable laws including but
-    not limited to HIPAA, The Anti-Kickback Statute, The Stark Law, and The
-    Eliminating Kickbacks in Recovery Act at all times during my employment with
-    PGL and if I have not or have any questions regarding compliance with these
-    laws I have contacted PGL's Chief Compliance Officer or management. In the
-    event you cannot in full honesty sign this attestation please contact PGL's
-    compliance hotline at 985-317-8102
+    </ol>
+    <p>
+      I also certify that I have complied with all applicable laws including but
+      not limited to HIPAA, The Anti-Kickback Statute, The Stark Law, and The
+      Eliminating Kickbacks in Recovery Act at all times during my employment
+      with PGL and if I have not or have any questions regarding compliance with
+      these laws I have contacted PGL's Chief Compliance Officer or management.
+    </p>
+    <p>
+      In the event you cannot in full honesty sign this attestation please
+      contact PGL's compliance hotline at 985-317-8102.
+    </p>
   </div>
 );
 
