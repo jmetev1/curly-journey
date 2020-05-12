@@ -107,9 +107,9 @@ const Home = ({ user }) => {
 const text = (
   <div style={{ textAlign: 'justify' }}>
     <p>
-      By digitally signing below you certify that in the past 30 days all money
-      spent on food, beverage, and other nominal items (less than $10 value) by
-      you in the course of your employment with PGL:
+      By signing below I certify that in the past 30 days all money spent on
+      food, beverage, and other nominal items (less than $10 value) by me in the
+      course of your employment with PGL:
     </p>
     <ol>
       {[
