@@ -13,14 +13,14 @@ import { NavLink } from 'react-router-dom';
 
 const height = 48;
 
-export const MySelectField = props => (
+export const MySelectField = (props) => (
   <SelectField {...props} inputHeight={height} />
 );
-export const MyTextarea = props => (
+export const MyTextarea = (props) => (
   <Textarea {...props} style={{ fontSize: '16px' }} />
 );
 
-export const MyTextInputField = props => (
+export const MyTextInputField = (props) => (
   <TextInputField {...props} inputHeight={height} />
 );
 
@@ -47,7 +47,7 @@ export const Wrapper = ({ children }) => (
   </Pane>
 );
 
-export const SubmitButton = function({ link = '' }) {
+export const SubmitButton = function ({ link = '' }) {
   const doIt = () => {
     this.setState({ submitted: false, waiting: true }, async () => {
       await this.submit();
@@ -72,7 +72,7 @@ export const SubmitButton = function({ link = '' }) {
 export const DevInfo = ({ children }) =>
   window.pglOptions.showState && <>{children}</>;
 
-export const addValue = function(key, event) {
+export const addValue = function (key, event) {
   const newState = {};
   const { value } = event.target;
   newState[key] = value;
@@ -93,7 +93,7 @@ export const OneVisit = ({ visit = {}, spending }) => {
       <div>
         Providers Present:
         <ol>
-          {providers.map(providerID => {
+          {providers.map((providerID) => {
             if (spending[providerID])
               return <li key={providerID}>{spending[providerID].name}</li>;
             else return 'Loading';
@@ -157,10 +157,10 @@ export const Err = ({ children }) => (
 /*eslint-disable no-unused-expressions*/
 export const compress = (e, cb) => {
   e.persist();
-  const width = 1000;
+  const width = 700;
   const reader = new FileReader();
   reader.readAsDataURL(e.target.files[0]);
-  reader.onload = event => {
+  reader.onload = (event) => {
     const img = new Image();
     img.src = event.target.result;
     img.onload = () => {
@@ -171,7 +171,7 @@ export const compress = (e, cb) => {
       // img.width and img.height will contain the original dimensions
       ctx.drawImage(img, 0, 0, width, elem.height);
       ctx.canvas.toBlob(
-        blob => {
+        (blob) => {
           const file = new File([blob], e.target.files[0].name, {
             type: 'image/jpeg',
             lastModified: Date.now(),
@@ -182,12 +182,12 @@ export const compress = (e, cb) => {
         1
       );
     };
-    reader.onerror = error => console.log(error);
+    reader.onerror = (error) => console.log(error);
   };
 };
 
 export const Header = ({ user }) => {
-  const MyButton = props => (
+  const MyButton = (props) => (
     <Button style={{ flex: '1 1 33%' }} height="36" {...props} />
   );
   const style = { margin: 'auto' };
