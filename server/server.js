@@ -20,7 +20,8 @@ const fileupload = require('express-fileupload');
 
 const store = new MongoDBStore(
   {
-    uri: `mongodb://cain:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
+    uri: `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
+
     databaseName: 'poolmap',
     collection: 'mySessions',
   },
@@ -82,7 +83,7 @@ app.post('/api/login', cors(), async (req, res) => {
 app.options('/api/visit', cors());
 
 app.get('/api/visits', cors(), async (req, res) => {
-  res.json(await db.getVisitsThisYear(req.session.rep));
+  res.json(await db.getVisits(req.session.rep));
 });
 
 app.options('/api/clinic', cors());
