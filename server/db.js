@@ -20,7 +20,7 @@ const {
 
 mongoose
   .connect(
-    `mongodb://cain:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
+    `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
     { connectTimeoutMS: 1000, useUnifiedTopology: true, useNewUrlParser: true }
   )
   .then(
@@ -218,6 +218,9 @@ const emailByRep = {
   las: 'bbauder@physiciansgrouplaboratories.com',
   andrewtest: 'ayeates@physiciansgrouplaboratories.com',
 };
+
+const realReps = ['mss', 'msn', 'lan', 'las'];
+
 const j = 'j.metevier+pglapp@gmail.com';
 emailByRep.test = j;
 emailByRep.jack = j;
@@ -225,6 +228,7 @@ emailByRep.jack = j;
 const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
   providers.map((ar) => {
     const { amount: totalForYear, name } = Array.isArray(ar) && ar[1];
+    console.log(229);
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const addresses = [emailByRep[rep] || 'jmetevier@gmail.com'];
 
@@ -234,11 +238,18 @@ const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
       subject: 'Approaching provider spending limit',
       html: `<div>Rep ${rep} just spent $${amountSpent} on ${name} at ${clinicName}. This brings total spending for ${name} to $${totalForYear}. </div>`,
     };
-    if (totalForYear > 399) {
+
+    if (totalForYear > 399 && realReps.includes(rep)) {
       msg.subject = 'Exceeded provider spending limit';
       msg.to.push(process.env.BOSS_EMAIL);
     }
-    sgMail.send(msg);
+    console.log('sending to', msg.to);
+    try {
+      sgMail.send(msg);
+    } catch (e) {
+      e;
+      console.log(e);
+    }
     return msg;
   });
 
@@ -257,7 +268,9 @@ exports.checkMaxAndEmail = async (rep, spendingByDoctor, newVisit) => {
 
 exports.getVisits = async (rep) => {
   const repToUse = rep === 'admin' ? {} : { rep };
-  return VisitModel.find(repToUse);
+  console.log({ rep }, 'ronald');
+  // return VisitModel.find(repToUse);
+  return VisitModel.find({});
 };
 
 exports.getVisitsThisYear = async (rep) => {
