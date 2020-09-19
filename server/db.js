@@ -18,16 +18,19 @@ const {
   AttestModel,
 } = Models;
 
+console.log(process.env.DBusername, process.env.DBPW);
 mongoose
   .connect(
     `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
     { connectTimeoutMS: 1000, useUnifiedTopology: true, useNewUrlParser: true }
   )
   .then(
-    () => {},
+    (suc) => {
+      console.log('db success', suc);
+    },
     (err) => {
       databaseError = err;
-      console.log(err);
+      console.log('real database connection error', err);
     }
   );
 const db = mongoose.connection;

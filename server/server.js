@@ -25,7 +25,12 @@ const store = new MongoDBStore(
     databaseName: 'poolmap',
     collection: 'mySessions',
   },
-  () => {}
+  (err) => {
+    console.log(' session store err', err);
+  },
+  (suc) => {
+    console.log('mongodb store succ?', suc);
+  }
 );
 const db = require('./db');
 
