@@ -15,7 +15,7 @@
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "dev-all": "run-p dev dev-server",
     "dev-server": "supervisor --inspect -w server/db.js,server/server.js -- server/server.js",
-    "test": "mocha --recursive tests --exit",
+    "test": "node tests",
     "precommit": "npm run build && npm run prodauth",
     "next": "npm run build && rm -rf node_modules && npm i --production"
   },
@@ -159,6 +159,7 @@
     "node": ">=10.0"
   },
   "devDependencies": {
+    "puppeteer": "^5.2.1",
     "@typescript-eslint/eslint-plugin": "^2.20.0",
     "@typescript-eslint/parser": "^2.20.0",
     "babel-eslint": "^10.0.3",

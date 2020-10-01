@@ -32,6 +32,9 @@ const store = new MongoDBStore(
     console.log('mongodb store succ?', suc);
   }
 );
+store.on('error other', (error) => {
+  console.log(error);
+});
 const db = require('./db');
 
 app.set('port', process.env.PORT || 3000);

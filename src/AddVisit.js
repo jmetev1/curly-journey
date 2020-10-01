@@ -82,7 +82,7 @@ export default class AddVisit extends React.Component {
         initialValues={
           prefill
             ? {
-                clinic: '5e025ebe112a290f5bf2cd26',
+                clinic: '5e016d700afaa520354490b2',
                 date: '2020-11-30T12:59',
                 providers: [],
                 reason: 'Educational Lunch',
@@ -164,16 +164,15 @@ export default class AddVisit extends React.Component {
                 <div style={{ display: 'flex' }}>
                   <div style={{ margin: 'auto' }}>
                     {dev && <button type="submit">check</button>}
-                    {this.state.receiptSubmitted || !validate ? (
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        children="Submit"
-                        height={60}
-                      />
-                    ) : (
-                      'Please Attach A Receipt Before Submitting'
-                    )}
+                    {/* {this.state.receiptSubmitted || !validate ? ( */}
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      children="Submit"
+                      height={60}
+                      name="submitvisit"
+                    />
+                    {/* ) : (                      'Please Attach A Receipt Before Submitting'                    )} */}
                     {isSubmitting && 'Adding Visit'}
                     {this.state.submitError && this.state.submitError}
                   </div>

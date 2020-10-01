@@ -10,14 +10,14 @@ import { Redirect } from 'react-router-dom';
 
 const Login = ({ setUser, user }) => {
   const [failed, setFailed] = useState(false);
-  const submit = values => {
+  const submit = (values) => {
     fetch(`${url}login`, {
       method: 'POST',
       body: JSON.stringify(values),
       headers: { 'Content-Type': 'application/json' },
     })
-      .then(r => r.json())
-      .then(loginResult => {
+      .then((r) => r.json())
+      .then((loginResult) => {
         if (loginResult) setUser(loginResult);
         else setFailed(true);
       });
@@ -36,9 +36,10 @@ const Login = ({ setUser, user }) => {
         <img src={logo} height="47px" alt="pgl logo" />
         <Formik
           initialValues={
-            process.env.NODE_ENV === 'development'
-              ? { username: 'test', password: 'wonderboy' }
-              : { username: '', password: '' }
+            // process.env.NODE_ENV === 'development'
+            //   ? { username: 'test', password: 'wonderboy' }
+            //   :
+            { username: '', password: '' }
           }
           onSubmit={submit}
           validationSchema={LoginSchema}
