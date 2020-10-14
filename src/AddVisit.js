@@ -19,10 +19,12 @@ export default class AddVisit extends React.Component {
   state = {
     allMyClinics: [],
     submitError: null,
+    receiptUpload: 'not started',
   };
 
   componentDidMount() {
     getMyClinics().then((allMyClinics) => this.setState({ allMyClinics }));
+    // fetch(url + 'error');
     fetch(url + 'getproviders')
       .then((r) => r.json())
       .then((providersByClinic) => {
@@ -56,23 +58,30 @@ export default class AddVisit extends React.Component {
   };
 
   uploadReceipt = (file) => {
+    this.setState({ receiptUpload: 'starting upload' });
     const data = new FormData();
     data.append('myFile', file);
     fetch(url + 'receipt', {
       method: 'POST',
       body: data,
-    })
-      .then((r) => {
-        if (r.ok) return r.json();
-        this.setState({
-          receiptUpload: 'Upload failed, please contact tech support',
-        });
-        throw new Error('Upload failed, please contact tech support');
-      })
-      .then((receiptID) =>
-        this.setState({ receiptID, receiptSubmitted: true })
-      );
+    }).then((r) =>
+      r
+        .json()
+        .then((json) =>
+          r.ok
+            ? this.setState({ receiptID: json, receiptUpload: 'success' })
+            : Promise.reject(json)
+        )
+        .catch((e) => {
+          this.setState({
+            receiptUpload:
+              'failed but you may continue submitting without upload.',
+          });
+          console.log(e);
+        })
+    );
   };
+
   render() {
     const { providersByClinic, allMyClinics } = this.state;
     let { validate, dev, prefill } = window.pglOptions;
@@ -124,8 +133,16 @@ export default class AddVisit extends React.Component {
                   type="file"
                   width={250}
                   marginBottom={32}
-                  onChange={(e) => compress(e, this.uploadReceipt)}
+                  onChange={(event) => {
+                    this.setState({ receiptUpload: 'starting compression' });
+                    compress(event, (file) => {
+                      this.setState({ receiptUpload: 'compression finished' });
+
+                      this.uploadReceipt(file);
+                    });
+                  }}
                 />
+                <b>Receipt Upload Status: </b>
                 {this.state.receiptUpload}
                 <ErrorMessage component={Err} name={'date'} />
                 <Field

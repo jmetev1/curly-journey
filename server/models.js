@@ -19,6 +19,7 @@ const VisitSchema = new Schema({
   providers: [String],
   clinic: String,
   clinicName: String,
+  photoLocation: String,
 });
 
 const ProviderSchema = new Schema({

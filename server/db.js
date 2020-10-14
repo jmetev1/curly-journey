@@ -18,7 +18,6 @@ const {
   AttestModel,
 } = Models;
 
-console.log(process.env.DBusername, process.env.DBPW);
 mongoose
   .connect(
     `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
@@ -156,7 +155,7 @@ exports.totalsForProviders = async (providers, clinicIDtoName) => {
   return spendingByDoctor;
 };
 
-exports.addPhoto = async (name) =>
+exports.addPhoto = (name) =>
   ReceiptModel.create({
     name,
     img: {
@@ -269,13 +268,14 @@ exports.checkMaxAndEmail = async (rep, spendingByDoctor, newVisit) => {
     : 'no email sent';
 };
 
-exports.getVisits = async (rep) => {
-  const repToUse = rep === 'admin' ? {} : { rep };
-  console.log({ rep }, 'ronald');
+/* we stopped searching by rep so that we can return all for admin view. i think we sort it out on
+ front end
+*/
+exports.getVisits = async () =>
+  // const repToUse = rep === 'admin' ? {} : { rep };
+  // console.log({ rep }, 'ronald');
   // return VisitModel.find(repToUse);
-  return VisitModel.find({});
-};
-
+  VisitModel.find({});
 exports.getVisitsThisYear = async (rep) => {
   const year = new Date().getFullYear();
   const query = {

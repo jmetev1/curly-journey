@@ -17,6 +17,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const fileupload = require('express-fileupload');
+const aws = require('./aws');
 
 const store = new MongoDBStore(
   {
@@ -27,9 +28,6 @@ const store = new MongoDBStore(
   },
   (err) => {
     console.log(' session store err', err);
-  },
-  (suc) => {
-    console.log('mongodb store succ?', suc);
   }
 );
 store.on('error other', (error) => {
@@ -115,29 +113,61 @@ app.post('/api/provider', cors(), async ({ body, ...rest }, res) => {
 });
 
 let name = '0.8708915141890314';
-app.post('/api/receipt', async (req, res) => {
+
+app.post('/api/receipt', async (req, res, next) => {
   name = Math.random().toString();
   const pathToFile = `./receipts/${name}.png`;
   req.files.myFile.mv(pathToFile, async (err) => {
-    if (err) res.status(500).send(err);
-    else res.json((await db.addPhoto(name))._id);
+    if (err) next(err);
+    await aws.addPhoto(name).then(({ key, cb }) => {
+      cb.then(
+        (data) => {
+          console.log({ key });
+          if (data) res.json(key);
+        },
+        (error) => {
+          if (error) res.json(error);
+        }
+      ).catch((error) => {
+        if (error) res.json(error);
+      });
+    });
   });
 });
 
-app.get('/api/receipt/:receiptID', async (req, res) => {
-  const [doc] = await db.receipt(req.params.receiptID);
-  if (doc) {
-    res.contentType(doc.img.contentType);
-    res.send(doc.img.data);
-  } else {
-    res.send('no dice');
-  }
+app.get('/api/error', (req, res, next) => {
+  throw new Error('This is an error and it should be logged to the console');
+});
+
+const getPhotoFromMlab = (id) =>
+  db.receipt(id).then((array) => {
+    const [doc] = array;
+    if (doc) return doc;
+    return Promise.reject(new Error('not found'));
+  });
+
+const getPhotoFromS3 = (id) =>
+  aws.receipt(id).then(
+    (data) => data,
+    (error) => Promise.reject(error)
+  );
+
+app.get('/api/receipt/:receiptKey', (req, res, next) => {
+  const { receiptID } = req.params;
+
+  return Promise.any([getPhotoFromMlab(receiptID), getPhotoFromS3(receiptID)])
+    .then((data) => {
+      res.contentType(data.ContentType);
+      res.send(data.Body);
+    })
+    .catch(next);
 });
 
 app.post('/api/visit', cors(), async (req, res) => {
   const addVisitResult = await db.addVisit({
     ...req.body,
     rep: req.session.rep,
+    photoLocation: 's3',
   });
   res.json(addVisitResult);
 });
@@ -154,6 +184,17 @@ app.post('/api/clinic', cors(), async (req, res) =>
 app.get('/api/clinic', cors(), async (req, res) => {
   const allClinics = await db.getClinic(req.session.rep);
   res.send(JSON.stringify(allClinics));
+});
+
+app.use((err, req, res, next) => {
+  // set locals, only providing error in development
+  if (err) console.log('middleware', err);
+  // res.locals.message = err.message;
+  // res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.json(err);
 });
 
 const server = http.createServer(app);
