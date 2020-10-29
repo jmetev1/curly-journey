@@ -115,7 +115,8 @@ app.post('/api/provider', cors(), async ({ body, ...rest }, res) => {
 let name = '0.8708915141890314';
 
 app.post('/api/receipt', async (req, res, next) => {
-  name = Math.random().toString();
+  name = 's3';
+  name += Math.random().toString();
   const pathToFile = `./receipts/${name}.png`;
   req.files.myFile.mv(pathToFile, async (err) => {
     if (err) next(err);
@@ -135,32 +136,44 @@ app.post('/api/receipt', async (req, res, next) => {
   });
 });
 
+// Are req res and next needed?
+/* eslint-disable no-unused-vars */
 app.get('/api/error', (req, res, next) => {
   throw new Error('This is an error and it should be logged to the console');
 });
 
-const getPhotoFromMlab = (id) =>
-  db.receipt(id).then((array) => {
-    const [doc] = array;
-    if (doc) return doc;
-    return Promise.reject(new Error('not found'));
-  });
+const getMlab = async (id) => {
+  const [doc] = await db.receipt(id);
+  if (doc) {
+    return {
+      ContentType: doc.img.contentType,
+      Body: doc.img.data
+    };
+  }
+  return null;
+};
 
-const getPhotoFromS3 = (id) =>
-  aws.receipt(id).then(
-    (data) => data,
-    (error) => Promise.reject(error)
-  );
+const getS3 = async (id) => {
+  const file = await aws.receipt(id);
+  if (file) return file;
+  return null;
+};
 
-app.get('/api/receipt/:receiptKey', (req, res, next) => {
+// TODO: Handle nonexistent photo (instead of throwing error)
+// Must run async or throws error because doc is not yet defined
+// Running very slow, why??
+app.get('/api/receipt/:receiptID', async (req, res, next) => {
   const { receiptID } = req.params;
+  const s3 = receiptID.substring(0, 2) === 's3';
 
-  return Promise.any([getPhotoFromMlab(receiptID), getPhotoFromS3(receiptID)])
-    .then((data) => {
-      res.contentType(data.ContentType);
-      res.send(data.Body);
-    })
-    .catch(next);
+  // Find a better way to handle this switch
+  const file = await (s3 ? getS3 : getMlab)(receiptID);
+  if (file) {
+    res.contentType(file.ContentType);
+    res.send(file.Body);
+  } else {
+    res.send('Image not found');
+  }
 });
 
 app.post('/api/visit', cors(), async (req, res) => {
