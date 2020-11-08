@@ -177,26 +177,24 @@ app.get('/api/clinic', cors(), async (req, res) => {
   res.send(JSON.stringify(allClinics));
 });
 
-const errorHandler = (err, req, res) => {
+// don't take the next out!!
+// eslint-disable-next-line
+app.use((err, req, res, next) => {
   if (err) {
     console.log('middleware', err);
 
     res.status(err.status || 500);
     res.json(err.message);
   }
-  // res.locals.message = err.message;
-  // res.locals.error = req.app.get('env') === 'development' ? err : {};
-};
+});
 const server = http.createServer(app);
 
 if (development) {
   reload(app)
     .then(() => {
-      app.use(errorHandler);
       server.listen(app.get('port'), () => {
         console.log(`Web server listening on port ${app.get('port')}`);
       });
-      // });
     })
     .catch((err) => {
       console.error(
@@ -208,11 +206,9 @@ if (development) {
   app.get('*', (req, res) => {
     res.sendFile(path.join(buildDir, 'index.html'));
   });
-  // app.use(errorHandler).then(() => {
   server.listen(app.get('port'), () => {
     console.log(`Web server listening on port ${app.get('port')}`);
   });
-  // });
 }
 
 module.exports = app;
