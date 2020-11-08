@@ -20,12 +20,13 @@ const {
 
 mongoose
   .connect(
-    `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
+    // `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
+    `mongodb+srv://${process.env.DBusername}:${process.env.DBPW}@poolmap.ppvei.mongodb.net/poolmap?retryWrites=true&w=majority`,
     { connectTimeoutMS: 1000, useUnifiedTopology: true, useNewUrlParser: true }
   )
   .then(
     (suc) => {
-      console.log('db success', suc);
+      console.log('db success');
     },
     (err) => {
       databaseError = err;
@@ -164,7 +165,16 @@ exports.addPhoto = (name) =>
     },
   });
 
-exports.receipt = async (_id) => ReceiptModel.find({ _id });
+exports.receipt = (_id) =>
+  ReceiptModel.find({ _id }).then(([doc]) => {
+    if (doc) {
+      return {
+        ContentType: doc.img.contentType,
+        Body: doc.img.data,
+      };
+    }
+    return Promise.reject(new Error('no mongo receipt found here'));
+  });
 
 exports.addClinic = async (req) => ClinicModel.create(req);
 
@@ -249,7 +259,6 @@ const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
     try {
       sgMail.send(msg);
     } catch (e) {
-      e;
       console.log(e);
     }
     return msg;

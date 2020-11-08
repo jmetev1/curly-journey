@@ -14,8 +14,8 @@
     "fresh": "rm -rf node_modules && npm i",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "dev-all": "run-p dev dev-server",
-    "dev-server": "supervisor --inspect -w server/db.js,server/server.js -- server/server.js",
-    "test": "node tests",
+    "dev-server": "supervisor --inspect -w server -- server/server.js",
+    "test": "node tests/test.js",
     "precommit": "npm run build && npm run prodauth",
     "next": "npm run build && rm -rf node_modules && npm i --production"
   },
