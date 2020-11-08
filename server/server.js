@@ -22,7 +22,7 @@ const aws = require('./aws');
 const store = new MongoDBStore(
   {
     uri: `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
-
+    // uri: `mongodb+srv://${process.env.DBusername}:${process.env.DBPW}@poolmap.ppvei.mongodb.net/poolmap?retryWrites=true&w=majority`,
     databaseName: 'poolmap',
     collection: 'mySessions',
   },
@@ -30,8 +30,8 @@ const store = new MongoDBStore(
     console.log(' session store err', err);
   }
 );
-store.on('error other', (error) => {
-  console.log(error);
+store.on('error', (error) => {
+  console.log('error other', error);
 });
 const db = require('./db');
 
@@ -56,6 +56,7 @@ app.get('/api/totalsForProviders', async (req, res) => {
 app.options('/api/login', cors());
 
 app.get('/api/login', cors(), async (req, res) => {
+  // debugger;
   const { rep } = req && req.session;
   const details = await db.getUser(rep);
   if (rep) {
@@ -136,44 +137,21 @@ app.post('/api/receipt', async (req, res, next) => {
   });
 });
 
-// Are req res and next needed?
-/* eslint-disable no-unused-vars */
-app.get('/api/error', (req, res, next) => {
+app.get('/api/error', () => {
   throw new Error('This is an error and it should be logged to the console');
 });
 
-const getMlab = async (id) => {
-  const [doc] = await db.receipt(id);
-  if (doc) {
-    return {
-      ContentType: doc.img.contentType,
-      Body: doc.img.data
-    };
-  }
-  return null;
-};
-
-const getS3 = async (id) => {
-  const file = await aws.receipt(id);
-  if (file) return file;
-  return null;
-};
-
-// TODO: Handle nonexistent photo (instead of throwing error)
-// Must run async or throws error because doc is not yet defined
-// Running very slow, why??
 app.get('/api/receipt/:receiptID', async (req, res, next) => {
   const { receiptID } = req.params;
-  const s3 = receiptID.substring(0, 2) === 's3';
-
-  // Find a better way to handle this switch
-  const file = await (s3 ? getS3 : getMlab)(receiptID);
-  if (file) {
-    res.contentType(file.ContentType);
-    res.send(file.Body);
-  } else {
-    res.send('Image not found');
-  }
+  const storedInS3 = receiptID.substring(0, 2) === 's3';
+  const imageLocation = storedInS3 ? aws : db;
+  imageLocation
+    .receipt(receiptID)
+    .then(({ ContentType, Body }) => {
+      res.contentType(ContentType);
+      res.send(Body);
+    })
+    .catch(next);
 });
 
 app.post('/api/visit', cors(), async (req, res) => {
@@ -199,17 +177,16 @@ app.get('/api/clinic', cors(), async (req, res) => {
   res.send(JSON.stringify(allClinics));
 });
 
+// don't take the next out!!
+// eslint-disable-next-line
 app.use((err, req, res, next) => {
-  // set locals, only providing error in development
-  if (err) console.log('middleware', err);
-  // res.locals.message = err.message;
-  // res.locals.error = req.app.get('env') === 'development' ? err : {};
+  if (err) {
+    console.log('middleware', err);
 
-  // render the error page
-  res.status(err.status || 500);
-  res.json(err);
+    res.status(err.status || 500);
+    res.json(err.message);
+  }
 });
-
 const server = http.createServer(app);
 
 if (development) {
@@ -229,7 +206,6 @@ if (development) {
   app.get('*', (req, res) => {
     res.sendFile(path.join(buildDir, 'index.html'));
   });
-
   server.listen(app.get('port'), () => {
     console.log(`Web server listening on port ${app.get('port')}`);
   });
