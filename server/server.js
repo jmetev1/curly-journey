@@ -21,8 +21,8 @@ const aws = require('./aws');
 
 const store = new MongoDBStore(
   {
-    uri: `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
-    // uri: `mongodb+srv://${process.env.DBusername}:${process.env.DBPW}@poolmap.ppvei.mongodb.net/poolmap?retryWrites=true&w=majority`,
+    // uri: `mongodb://${process.env.DBusername}:${process.env.DBPW}@ds127783.mlab.com:27783/poolmap`,
+    uri: `mongodb+srv://${process.env.DBusername}:${process.env.DBPW}@poolmap.ppvei.mongodb.net/poolmap?retryWrites=true&w=majority`,
     databaseName: 'poolmap',
     collection: 'mySessions',
   },
@@ -128,10 +128,10 @@ app.post('/api/receipt', async (req, res, next) => {
           if (data) res.json(key);
         },
         (error) => {
-          if (error) res.json(error);
+          if (error) next(error);
         }
       ).catch((error) => {
-        if (error) res.json(error);
+        if (error) next(error);
       });
     });
   });

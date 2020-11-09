@@ -211,14 +211,15 @@ exports.spendingByDoctor = async (rep, clinic) => {
 exports.addVisit = async (body) => {
   const { _id, providers } = await VisitModel.create(body);
   if (_id) {
-    let emailResult;
-    try {
-      const totals = await this.totalsForProviders(providers);
-      emailResult = await exports.checkMaxAndEmail(body.rep, totals, body);
-    } catch (e) {
-      emailResult = `failed to email with ${JSON.stringify({ providers })}`;
-    }
-    return { _id, email: emailResult };
+    // let emailResult;
+    // try {
+    // const totals = await this.totalsForProviders(providers);
+    // emailResult = await exports.checkMaxAndEmail(body.rep, totals, body);
+    // } catch (e) {
+    // emailResult = `failed to email with ${JSON.stringify({ providers })}`;
+    // }
+    return { _id };
+    // , email: emailResult };
   }
   return 'db create failed';
 };
@@ -256,11 +257,9 @@ const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
       msg.to.push(process.env.BOSS_EMAIL);
     }
     console.log('sending to', msg.to);
-    try {
-      sgMail.send(msg);
-    } catch (e) {
-      console.log(e);
-    }
+    // await sgMail.send(msg).then(() => console.log('msg sent')).catch ((e) => {
+    //   console.log(e, 'failed at sending sendgrid')
+    // })
     return msg;
   });
 
