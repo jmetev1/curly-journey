@@ -30,6 +30,7 @@ const store = new MongoDBStore(
     console.log(' session store err', err);
   }
 );
+
 store.on('error', (error) => {
   console.log('error other', error);
 });
@@ -48,6 +49,10 @@ app.use(
   bodyParser.json()
 );
 
+process.on('uncaughtException', (err) => {
+  console.error('global exception:', err.message);
+});
+
 app.get('/api/totalsForProviders', async (req, res) => {
   const totals = await db.getTotalsByRep(req.session.rep);
   res.json(totals.sort(({ amount }, b) => b.amount - amount));
@@ -55,16 +60,20 @@ app.get('/api/totalsForProviders', async (req, res) => {
 
 app.options('/api/login', cors());
 
-app.get('/api/login', cors(), async (req, res) => {
-  // debugger;
-  const { rep } = req && req.session;
-  const details = await db.getUser(rep);
-  if (rep) {
-    res.json(details);
-  } else {
-    res.json(false);
-  }
-});
+// app.get('/api/login', cors(), async (req, res, next) => {
+//   // debugger;
+//   const { rep } = req && req.session;
+//   console.log(66, rep);
+//   if (rep) {
+//     console.log(67);
+//     db.getUser(rep).then(res.json).catch(e => {
+//       console.log(68, e);
+//       next(e);
+//     });
+//   } else {
+//     res.json(false);
+//   }
+// });
 
 app.post('/api/sign', async (req, res) => {
   const { id, status } = req.body;
@@ -76,15 +85,19 @@ app.get('/api/logout', cors(), (req, res) => {
   res.send(JSON.stringify('ok'));
 });
 
+/* in past we used usernames for everything in database. now
+that we're using cognito, we have these ids. but for old
+users we need to map to old region or rep name
+*/
+const idToOldUsername = id => ({
+  '527fabfc-363f-4d40-ba84-6eefd7f4c75d': 'jpm'
+}[id] || id);
+
 app.post('/api/login', cors(), async (req, res) => {
-  const { username, password } = req.body;
-  if (process.env[username] === password) {
-    const rep = username;
-    req.session.rep = username;
-    res.json(await db.getUser(rep));
-  } else {
-    res.json(false);
-  }
+  const oldUsername = idToOldUsername(req.body.id);
+  // console.log({ oldUsername });
+  req.session.rep = oldUsername;
+  res.json(true);
 });
 
 app.options('/api/visit', cors());
@@ -119,27 +132,54 @@ app.post('/api/receipt', async (req, res, next) => {
   name = 's3';
   name += Math.random().toString();
   const pathToFile = `./receipts/${name}.png`;
-  req.files.myFile.mv(pathToFile, async (err) => {
+  req.files.myFile.mv(pathToFile, (err) => {
     if (err) next(err);
-    await aws.addPhoto(name).then(({ key, cb }) => {
-      cb.then(
-        (data) => {
-          console.log({ key });
-          if (data) res.json(key);
-        },
-        (error) => {
-          if (error) next(error);
-        }
-      ).catch((error) => {
-        if (error) next(error);
-      });
-    });
+    else {
+      aws
+        .addPhoto(name)
+        .then(() => {
+          // console.log({ key });
+          res.json(name);
+        })
+        .catch((error) => {
+          next(error);
+        });
+    }
   });
 });
 
 app.get('/api/error', () => {
   throw new Error('This is an error and it should be logged to the console');
 });
+
+app.get('/api/crash/sync',
+  () => {
+    // plain synchronous error
+    console.log('before throwing sync error');
+    throw new Error('This is a test error from middleware (crasher)');
+  }
+);
+
+function crash() {
+  console.log('before async crash');
+  throw new Error('This is a test async error (crasher)');
+}
+// not catching
+app.get('/crash/async',
+  () => {
+    setTimeout(crash, 500);
+  });
+
+
+// app.get('/crash/promise', require('crasher/promise'))
+// app.get('/api/crash-async', (req, res) => {
+//   console.log('async crashing');
+//   setTimeout(() => {
+//     throw new Error('Async error');
+//   }, 100);
+//   // this code runs fine
+//   res.send('after async crash\n');
+// });
 
 app.get('/api/receipt/:receiptID', async (req, res, next) => {
   const { receiptID } = req.params;

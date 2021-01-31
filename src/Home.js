@@ -17,7 +17,9 @@ export const OneAttest = ({ date, signed, children, i }) => {
         hasFooter={false}
         hasHeader={false}
       >
-        {({ close }) => (
+        {({ close }) => {
+          console.log('inputname',inputName.trim().toLowerCase(), employees)
+          return (
           <>
             {text}
             <br />
@@ -35,7 +37,7 @@ export const OneAttest = ({ date, signed, children, i }) => {
               Close without signing
             </Button>
           </>
-        )}
+        )}}
       </Dialog>
       {months[month]} {year}
       <div>
@@ -83,7 +85,8 @@ const Home = ({ user }) => {
       .then((res) => res.json())
       .then(setAttests);
   };
-  const needToSign = attests.filter(({ signed }) => !signed);
+  const needToSign =[]
+  // const needToSign = attests.filter(({ signed }) => !signed);
 
   return needToSign.length ? (
     <>

@@ -8,24 +8,10 @@ import {
 } from 'react-router-dom';
 import { routeNames, Loading, Pretty } from './Fields';
 
-const App = ({ userPromise }) => {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-    userPromise
-      .then(res => res.json())
-      .then(userFromServer => {
-        console.log('app.js, user from server', userFromServer);
-        setUser(userFromServer);
-        setLoading(false);
-      })
-      .catch(e => {
-        throw new Error(e, 'app js setState on comp did mount');
-      });
-  }, [userPromise]);
-  return loading ? (
-    <Loading />
-  ) : (
+const App = ({ wholeUser }) => {
+  const { username } = wholeUser;
+  const user = username === 'jmetevier' ? 'jpm' : 'uh oh'
+  return (
     <Router>
       <Suspense fallback={<Loading />}>
         <Switch>
@@ -36,26 +22,25 @@ const App = ({ userPromise }) => {
                 key={componentName}
                 path={`/${componentName.toLowerCase()}`}
                 render={props => {
-                  if (!user) return <Redirect to="/login" />;
-                  else {
-                    const Component = lazy(() => import(`./${componentName}`));
-                    return (
-                      <Pretty user={user?.region}>
-                        <Component {...props} user={user} />
-                      </Pretty>
-                    );
-                  }
+
+                  const Component = lazy(() => import(`./${componentName}`));
+                  return (
+                    <Pretty user={user?.region}>
+                      <Component {...props} user={user} />
+                    </Pretty>
+                  );
                 }}
               />
             );
           })}
-          <Route
+          {/* <Route
             path="/login"
             render={() => {
-              const Component = lazy(() => import('./Login'));
-              return <Component setUser={setUser} user={user} />;
+              // const Component = lazy(() => import('./LoginNew'));
+              // const Component = lazy(() => import('./Login'));
+              return <Component  user={user} />;
             }}
-          />
+          /> */}
           <Route>
             <Redirect to={user ? '/home' : '/login'} />
           </Route>

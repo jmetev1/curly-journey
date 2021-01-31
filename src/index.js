@@ -1,20 +1,15 @@
 import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import { url } from './url';
 import { ErrorBoundary } from './ErrorBoundary';
+import Auth from './Auth';
+
 
 const dev = process.env.NODE_ENV === 'development';
 
-// const id = setInterval(() => {
-//   fetch(url + 'totalsForProviders').then(things => {
-//     if (things.status === 200) clearInterval(id);
-//   });
-// }, 200);
-
 if (!window.pglOptions) window.pglOptions = {};
-const userPromise = fetch(url + 'login', { credentials: 'include' });
+// const userPromise = fetch(url + 'login', { credentials: 'include' });
 
 for (let [key, value] of Object.entries({
   dev,
@@ -35,7 +30,7 @@ for (let [key, value] of Object.entries({
 ReactDOM.render(
   <ErrorBoundary>
     <StrictMode>
-      <App userPromise={userPromise} />
+      <Auth />
     </StrictMode>
   </ErrorBoundary>,
   document.getElementById('root')

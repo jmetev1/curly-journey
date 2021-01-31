@@ -11,7 +11,7 @@ AWS.config.update({
 });
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
-exports.addPhoto = async (name) => {
+exports.addPhoto = (name) => {
   const params = {
     Bucket: process.env.AWS_bucketname,
     Key: name,
@@ -19,10 +19,7 @@ exports.addPhoto = async (name) => {
     ContentType: 'image/png',
   };
 
-  return {
-    key: name,
-    cb: s3.putObject(params).promise(),
-  };
+  return s3.putObject(params).promise();
 };
 
 exports.receipt = async (key) => {

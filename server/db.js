@@ -60,28 +60,29 @@ const getLastMonth = (today) => {
 exports.getUser = async (region) => {
   const users = await UserModel.find({ region });
   let user;
-  if (users.length > 1) throw new Error('repeat users');
-  else if (users.length === 0) user = await UserModel.create({ region });
-  else [user] = users;
-  const attests = [{ signed: 'failed', date: 'failed' }];
-  try {
-    const lastMonth = getLastMonth(new Date());
-    const copyAttests = [...user.attests];
-    const alreadyExists = copyAttests.some(
-      (attest) => attest.date === lastMonth
-    );
-    if (!alreadyExists) {
-      const attestToAdd = await AttestModel.create({
-        date: lastMonth,
-        signed: false,
-      });
-      user.attests.addToSet(attestToAdd);
-      await user.save();
-    }
-  } catch (e) {
-    user.attests = attests;
-  }
-  return user;
+  throw new Error('repeat users');
+  // if (users.length > 1)
+  // else if (users.length === 0) user = await UserModel.create({ region });
+  // else [user] = users;
+  // const attests = [{ signed: 'failed', date: 'failed' }];
+  // try {
+  //   const lastMonth = getLastMonth(new Date());
+  //   const copyAttests = [...user.attests];
+  //   const alreadyExists = copyAttests.some(
+  //     (attest) => attest.date === lastMonth
+  //   );
+  //   if (!alreadyExists) {
+  //     const attestToAdd = await AttestModel.create({
+  //       date: lastMonth,
+  //       signed: false,
+  //     });
+  //     user.attests.addToSet(attestToAdd);
+  //     await user.save();
+  //   }
+  // } catch (e) {
+  //   user.attests = attests;
+  // }
+  // return user;
 };
 
 exports.addProvider = async (req) => ProviderModel.create(req);
