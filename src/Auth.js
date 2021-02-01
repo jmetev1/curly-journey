@@ -25,16 +25,19 @@ const Auth = () => {
     onAuthUIStateChange((nextAuthState, authData) => {
       setAuthState(nextAuthState);
 
-      fetch(`${url}login`, {
-        method: 'POST',
-        body: JSON.stringify({ id: authData.attributes.sub }),
-        headers: { 'Content-Type': 'application/json' },
-      })
-        .then((r) => r.json())
-        .then((loginResult) => {
-          if (loginResult) setUser(authData)
-          else throw new Error('did not get true from post to login instead got', loginResult)
-        });
+      if (authData) {
+        fetch(`${url}login`, {
+          method: 'POST',
+          body: JSON.stringify({ username: authData.username }),
+          headers: { 'Content-Type': 'application/json' },
+        })
+          .then((r) => r.json())
+          .then((loginResult) => {
+            if (loginResult) setUser(authData)
+            else throw new Error('did not get true from post to login instead got', loginResult)
+          });
+      }
+
     });
   }, []);
 

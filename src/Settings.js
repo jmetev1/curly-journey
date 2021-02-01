@@ -6,7 +6,7 @@ import { url } from './url';
 
 export default class Settings extends React.Component {
   constructor() {
-    super();
+    super()
     this.state = {
       ...window.pglOptions,
       updateOptions: (key, { target: { checked } }) => {
@@ -41,7 +41,7 @@ export default class Settings extends React.Component {
             />
           </Label>
         ))}
-        {attests.map((a, i) => (
+        {/* {attests.map((a, i) => (
           <div key={a._id} style={{ border: '1px solid black' }}>
             <OneAttest {...a} key={a._id} i={i}>
               <div style={{ paddingTop: '4px' }}>
@@ -54,7 +54,7 @@ export default class Settings extends React.Component {
               </div>
             </OneAttest>
           </div>
-        ))}
+        ))} */}
       </Pane>
     );
   }

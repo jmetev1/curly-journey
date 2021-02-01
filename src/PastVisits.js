@@ -6,7 +6,6 @@ import { TabNavigation, Tab } from 'evergreen-ui';
 
 const PastVisits = () => {
   const [showByClinic, setShowByClinic] = useState(true);
-  const toggleShowByClinic = setShowByClinic.bind(null, !showByClinic);
 
   return (
     <>
@@ -15,17 +14,17 @@ const PastVisits = () => {
           key="one"
           id="one"
           isSelected={showByClinic}
-          onSelect={toggleShowByClinic}
+          onSelect={() => setShowByClinic(true)}
         >
-          Show Visits By Clinic
+          Show Visits By Clinic For {new Date().getFullYear()}
         </Tab>
         <Tab
           key="two"
           id="two"
           isSelected={!showByClinic}
-          onSelect={toggleShowByClinic}
+          onSelect={() => setShowByClinic(false)}
         >
-          Show Visits By Spending
+          Show Visits By Spending For All Years
         </Tab>
       </TabNavigation>
 
@@ -86,8 +85,8 @@ class PastVisitsByClinic extends React.Component {
             clinics={clinicsThatHaveVisits}
           />
         ) : (
-          'Loading'
-        )}
+            'Loading'
+          )}
       </Wrapper>
     );
   }
@@ -111,6 +110,6 @@ const SelectClinicModule = ({ clinics, byClinic }) => {
   );
 };
 /*
-get spending by docotr seems to fail with admin
+get spending by doctor seems to fail with admin
 */
 export default PastVisits;

@@ -58,22 +58,6 @@ app.get('/api/totalsForProviders', async (req, res) => {
   res.json(totals.sort(({ amount }, b) => b.amount - amount));
 });
 
-app.options('/api/login', cors());
-
-// app.get('/api/login', cors(), async (req, res, next) => {
-//   // debugger;
-//   const { rep } = req && req.session;
-//   console.log(66, rep);
-//   if (rep) {
-//     console.log(67);
-//     db.getUser(rep).then(res.json).catch(e => {
-//       console.log(68, e);
-//       next(e);
-//     });
-//   } else {
-//     res.json(false);
-//   }
-// });
 
 app.post('/api/sign', async (req, res) => {
   const { id, status } = req.body;
@@ -90,12 +74,12 @@ that we're using cognito, we have these ids. but for old
 users we need to map to old region or rep name
 */
 const idToOldUsername = id => ({
-  '527fabfc-363f-4d40-ba84-6eefd7f4c75d': 'jpm'
+  jmetevier: 'jpm',
+  mss: 'mss'
 }[id] || id);
 
 app.post('/api/login', cors(), async (req, res) => {
-  const oldUsername = idToOldUsername(req.body.id);
-  // console.log({ oldUsername });
+  const oldUsername = idToOldUsername(req.body.username);
   req.session.rep = oldUsername;
   res.json(true);
 });

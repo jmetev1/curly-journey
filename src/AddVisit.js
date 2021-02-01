@@ -24,7 +24,6 @@ export default class AddVisit extends React.Component {
 
   componentDidMount() {
     getMyClinics().then((allMyClinics) => this.setState({ allMyClinics }));
-    // fetch(url + 'error');
     fetch(url + 'getproviders')
       .then((r) => r.json())
       .then((providersByClinic) => {
@@ -91,21 +90,21 @@ export default class AddVisit extends React.Component {
         initialValues={
           prefill
             ? {
-                clinic: '5e016d700afaa520354490b2',
-                date: '2020-11-30T12:59',
-                providers: [],
-                reason: 'Educational Lunch',
-                amountSpent: 400,
-                materials: [],
-              }
+              clinic: '5e016d700afaa520354490b2',
+              date: '2021-01-30T12:59',
+              providers: [],
+              reason: 'Educational Lunch',
+              amountSpent: 400,
+              materials: [],
+            }
             : {
-                clinic: '',
-                date: '',
-                providers: [],
-                reason: '0',
-                amountSpent: '',
-                materials: [],
-              }
+              clinic: '',
+              date: '',
+              providers: [],
+              reason: '0',
+              amountSpent: '',
+              materials: [],
+            }
         }
         validationSchema={validate && AddVisitSchema}
         onSubmit={this.submit}

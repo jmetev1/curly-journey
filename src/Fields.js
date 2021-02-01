@@ -63,10 +63,10 @@ export const SubmitButton = function ({ link = '' }) {
       <div>{link || <button onClick={reload}>Add Another</button>}</div>
     </div>
   ) : (
-    <Button onClick={doIt} appearance="primary">
-      Submit
-    </Button>
-  );
+      <Button onClick={doIt} appearance="primary">
+        Submit
+      </Button>
+    );
 };
 
 export const DevInfo = ({ children }) =>
@@ -103,8 +103,8 @@ export const OneVisit = ({ visit = {}, spending }) => {
       {receiptID && receiptID.length ? (
         <Receipt src={`${url}receipt/${receiptID}`} />
       ) : (
-        'No image was uploaded'
-      )}
+          'No image was uploaded'
+        )}
     </>
   );
 };
@@ -132,23 +132,23 @@ export const Receipt = ({ src }) => {
       </div>
     </div>
   ) : (
-    <>
-      <h4>Click To Enlarge</h4>
-      <div style={{ display: 'flex', height: '350px' }}>
-        <div style={{ margin: 'auto', transform: 'rotate(90deg)' }}>
-          <div onClick={toggle}>
-            <img
-              height="250px"
-              onLoad={() => setLoading(false)}
-              src={src}
-              alt="receipt"
-            />
-            {loading && <Spinner />}
+      <>
+        <h4>Click To Enlarge</h4>
+        <div style={{ display: 'flex', height: '350px' }}>
+          <div style={{ margin: 'auto', transform: 'rotate(90deg)' }}>
+            <div onClick={toggle}>
+              <img
+                height="250px"
+                onLoad={() => setLoading(false)}
+                src={src}
+                alt="receipt"
+              />
+              {loading && <Spinner />}
+            </div>
           </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
 };
 
 export const Err = ({ children }) => (
@@ -197,12 +197,9 @@ export const Header = ({ user }) => {
     <nav style={{ display: 'flex', flexWrap: 'wrap' }}>
       {window.pglOptions.dev && (
         <MyButton key="user">
-          <span style={style}>user is {user}</span>
+          <span style={style}>Hi {user}!</span>
         </MyButton>
       )}
-      <MyButton key="logout" onClick={logout}>
-        <span style={style}>Logout</span>
-      </MyButton>
       {Object.entries(routeNames)
         .filter(([label]) => {
           if (user === 'admin') return label === 'Past Visits';
@@ -268,9 +265,9 @@ export const routeNames = {
   Home: ['home'],
 };
 
-export const Pretty = ({ children, user }) => (
+export const Pretty = ({ children, username }) => (
   <>
-    <Header user={user} />
+    <Header user={username} />
     <Pane
       paddingTop={15}
       paddingBottom={100}

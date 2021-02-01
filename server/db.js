@@ -125,11 +125,11 @@ exports.getTotalsByRep = async (rep) => {
 };
 
 exports.totalsForProviders = async (providers, clinicIDtoName) => {
-  const year = new Date().getFullYear();
-  const min = `${year}-01-01`;
-  const max = `${year}-12-31`;
+  // const year = new Date().getFullYear();
+  // const min = `${year}-01-01`;
+  // const max = `${year}-12-31`;
   const visits = await VisitModel.find({
-    date: { $gte: min, $lte: max },
+    // date: { $gte: min, $lte: max },
     providers: {
       $in: providers,
     },
