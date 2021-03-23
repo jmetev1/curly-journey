@@ -212,15 +212,15 @@ exports.spendingByDoctor = async (rep, clinic) => {
 exports.addVisit = async (body) => {
   const { _id, providers } = await VisitModel.create(body);
   if (_id) {
-    // let emailResult;
-    // try {
-    // const totals = await this.totalsForProviders(providers);
-    // emailResult = await exports.checkMaxAndEmail(body.rep, totals, body);
-    // } catch (e) {
-    // emailResult = `failed to email with ${JSON.stringify({ providers })}`;
-    // }
+    let emailRes;
+    this.totalsForProviders(providers)
+      .then(totals => {
+        this.checkMaxAndEmail(body.rep, totals, body)
+          .then(res => { emailRes = res; });
+      });
+    console.log(emailRes);
+
     return { _id };
-    // , email: emailResult };
   }
   return 'db create failed';
 };
@@ -231,11 +231,12 @@ const emailByRep = {
   lan: 'hbroussard@getpgl.com',
   las: 'bbauder@physiciansgrouplaboratories.com',
   andrewtest: 'ayeates@physiciansgrouplaboratories.com',
+  awiggin: 'a.wiggin+pglapp@icloud.com',
 };
 
-const realReps = ['mss', 'msn', 'lan', 'las'];
+const realReps = ['mss', 'msn', 'lan', 'las', 'awiggin'];
 
-const j = 'j.metevier+pglapp@gmail.com';
+const j = 'a.wiggin+pglapp@icloud.com';
 emailByRep.test = j;
 emailByRep.jack = j;
 
@@ -244,7 +245,7 @@ const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
     const { amount: totalForYear, name } = Array.isArray(ar) && ar[1];
     console.log(229);
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    const addresses = [emailByRep[rep] || 'jmetevier@gmail.com'];
+    const addresses = [emailByRep[rep] || 'a.wiggin+pglapp@icloud.com'];
 
     const msg = {
       to: addresses,
@@ -258,9 +259,11 @@ const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
       msg.to.push(process.env.BOSS_EMAIL);
     }
     console.log('sending to', msg.to);
-    // await sgMail.send(msg).then(() => console.log('msg sent')).catch ((e) => {
-    //   console.log(e, 'failed at sending sendgrid')
-    // })
+    sgMail
+      .send(msg)
+      .then(
+        res => console.log(`Message sent with ${res}`),
+        error => console.log(`Failed to send sendgrid email with ${error}`, error.response ? error.response.body : ''));
     return msg;
   });
 
