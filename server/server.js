@@ -198,6 +198,7 @@ app.post('/api/clinic', cors(), async (req, res) =>
 
 app.get('/api/clinic', cors(), async (req, res) => {
   const allClinics = await db.getClinic(req.session.rep);
+  console.log({ allClinics });
   res.send(JSON.stringify(allClinics));
 });
 
@@ -214,6 +215,7 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 
 if (development) {
+  console.log('dev env');
   reload(app)
     .then(() => {
       server.listen(app.get('port'), () => {
@@ -227,6 +229,8 @@ if (development) {
       );
     });
 } else {
+  console.log('NOT dev env');
+
   app.get('*', (req, res) => {
     res.sendFile(path.join(buildDir, 'index.html'));
   });
