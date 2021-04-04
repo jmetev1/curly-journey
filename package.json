@@ -42,7 +42,7 @@
     "eslint-plugin-node": "^11.0.0",
     "evergreen-ui": "^4.23.0",
     "express": "4.16.2",
-    "express-fileupload": "^1.1.6",
+    "express-fileupload": "^1.1.9",
     "express-session": "^1.17.0",
     "file-loader": "3.0.1",
     "formik": "^2.0.3",
