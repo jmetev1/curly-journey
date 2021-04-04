@@ -198,7 +198,7 @@ app.post('/api/clinic', cors(), async (req, res) =>
 
 app.get('/api/clinic', cors(), async (req, res) => {
   const allClinics = await db.getClinic(req.session.rep);
-  console.log({ allClinics });
+  // console.log({ allClinics });
   res.send(JSON.stringify(allClinics));
 });
 

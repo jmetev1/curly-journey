@@ -87,6 +87,7 @@ exports.getUser = async (region) => {
 
 exports.addProvider = async (req) => ProviderModel.create(req);
 
+// returns an object mapping clinics to providers.
 exports.providersByRep = async (rep) => {
   const allProviders = await ProviderModel.find({ rep });
   return allProviders.reduce((acc, c) => {
@@ -99,6 +100,8 @@ exports.providersByRep = async (rep) => {
 
 exports.getClinic = async (rep) =>
   ClinicModel.find(rep === 'admin' ? {} : { rep });
+
+const allProvidersForRep = (rep) => ProviderModel.find({ rep });
 
 exports.getTotalsByRep = async (rep) => {
   const query = {};
@@ -125,18 +128,19 @@ exports.getTotalsByRep = async (rep) => {
 };
 
 exports.totalsForProviders = async (providers, clinicIDtoName) => {
-  // const year = new Date().getFullYear();
-  // const min = `${year}-01-01`;
-  // const max = `${year}-12-31`;
+  const year = new Date().getFullYear();
+  const min = `${year}-01-01`;
+  const max = `${year}-12-31`;
   const visits = await VisitModel.find({
-    // date: { $gte: min, $lte: max },
+    date: { $gte: min, $lte: max },
     providers: {
       $in: providers,
     },
   });
+
   const spendingByDoctor = visits.reduce((acc, c) => {
     c.providers.forEach((p) => {
-      acc[p] = (acc[p] || 0) + c.amountSpent / c.providers.length;
+      acc[p] = (acc[p] || 0) + (c.amountSpent / c.providers.length);
     });
     return acc;
   }, {});
@@ -231,39 +235,42 @@ const emailByRep = {
   lan: 'hbroussard@getpgl.com',
   las: 'bbauder@physiciansgrouplaboratories.com',
   andrewtest: 'ayeates@physiciansgrouplaboratories.com',
-  awiggin: 'a.wiggin+pglapp@icloud.com',
+  elyse: 'Ealford@providerschoicelab.com',
+  // awiggin: 'a.wiggin+pglapp@icloud.com',
 };
 
-const realReps = ['mss', 'msn', 'lan', 'las', 'awiggin'];
+const realReps = ['mss', 'msn', 'lan', 'las', 'awiggin', 'elyse'];
 
 const j = 'a.wiggin+pglapp@icloud.com';
 emailByRep.test = j;
 emailByRep.jack = j;
 
-const sendEmail = (providers, rep, { clinicName, amountSpent }) =>
-  providers.map((ar) => {
-    const { amount: totalForYear, name } = Array.isArray(ar) && ar[1];
-    console.log(229);
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    const addresses = [emailByRep[rep] || 'a.wiggin+pglapp@icloud.com'];
+const sendEmail = msg => {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  sgMail
+    .send(msg)
+    .then(
+      res => console.log(`Message sent with ${res}`),
+      error => console.log(`Failed to send sendgrid email with ${error}`, error.response ? error.response.body : ''));
+};
 
+const setupEmail = (providers, rep, { clinicName, amountSpent }) =>
+  providers.map(async (ar) => {
+    const { amount: totalForYear, name } = Array.isArray(ar) && ar[1];
+
+    const addresses = [emailByRep[rep] || 'j.metevier+pglapp@gmail.com'];
     const msg = {
       to: addresses,
-      from: 'PGL_Monitoring_app@pgl.com',
+      from: 'PGL_Monitoring_app@marypmatthews.net',
       subject: 'Approaching provider spending limit',
       html: `<div>Rep ${rep} just spent $${amountSpent} on ${name} at ${clinicName}. This brings total spending for ${name} to $${totalForYear}. </div>`,
     };
-
+    console.log('sending msg', msg);
     if (totalForYear > 399 && realReps.includes(rep)) {
       msg.subject = 'Exceeded provider spending limit';
-      msg.to.push(process.env.BOSS_EMAIL);
+      msg.to.push('ayeates@physiciansgrouplaboratories.com');
     }
-    console.log('sending to', msg.to);
-    sgMail
-      .send(msg)
-      .then(
-        res => console.log(`Message sent with ${res}`),
-        error => console.log(`Failed to send sendgrid email with ${error}`, error.response ? error.response.body : ''));
+    await sendEmail(msg);
     return msg;
   });
 
@@ -276,7 +283,7 @@ exports.checkMaxAndEmail = async (rep, spendingByDoctor, newVisit) => {
     }
   });
   return overLimit.length
-    ? sendEmail(overLimit, rep, newVisit)
+    ? setupEmail(overLimit, rep, newVisit)
     : 'no email sent';
 };
 
@@ -288,6 +295,7 @@ exports.getVisits = async () =>
   // console.log({ rep }, 'ronald');
   // return VisitModel.find(repToUse);
   VisitModel.find({});
+
 exports.getVisitsThisYear = async (rep) => {
   const year = new Date().getFullYear();
   const query = {
@@ -296,3 +304,66 @@ exports.getVisitsThisYear = async (rep) => {
   if (rep !== 'admin') query.rep = rep;
   return VisitModel.find(query);
 };
+
+// (async () => {
+//   const year = new Date().getFullYear();
+//   const min = `${year}-01-01`;
+//   const max = `${year}-12-31`;
+//   const visits = await VisitModel.find({
+//     // date: { $gte: min, $lte: max }
+//   });
+//   const reps = visits.reduce((acc, cur) => {
+//     const { rep } = cur;
+//     if (!rep) {
+//       acc.none = (acc.none || 0) + 1;
+//     } else if (acc[rep]) {
+//       acc[rep] += 1;
+//     } else {
+//       acc[rep] = 1;
+//     }
+//     return acc;
+//   }, {});
+//   console.log(reps);
+//   // // console.log(providers);
+//   // const totalsForProvidersArray = Object.values(await exports.totalsForProviders(providers));
+//   // // console.log(totalsForProvidersArray);
+//   // console.log(totalsForProvidersArray.sort((a, b) => b.amount - a.amount));
+//   // // exports.checkMaxAndEmail('test', totalsForProviders, )
+// })();
+// (async () => {
+//   const providers = (await allProvidersForRep('lan')).map(obj => obj._id);
+//   // console.log(providers);
+//   const totalsForProvidersArray = Object.values(await exports.totalsForProviders(providers));
+//   // console.log(totalsForProvidersArray);
+//   console.log(totalsForProvidersArray.sort((a, b) => b.amount - a.amount));
+//   // exports.checkMaxAndEmail('test', totalsForProviders, )
+// })();
+/*
+las
+24 visits this year
+94 all time
+max 211 this year.
+
+lan
+no data for this year
+
+
+mss no overages
+
+msn
+no overages
+
+{
+  nm: 16,
+  null: 2,
+  jacktest: 15,
+  test: 117,
+  las: 94,
+  mss: 53,
+  lan: 37,
+  msn: 195,
+  jpm: 18,
+  jack: 1,
+  awiggin: 16
+}
+*/
